@@ -1,0 +1,206 @@
+" vim rc
+
+set nocp
+set bg=dark
+
+set bk
+set bdir=~/tmp,.,/tmp
+set dir=~/tmp,/tmp,.
+set cf
+set vi='100,<100
+
+set sc
+" set ch=2
+set wmnu
+set ls=2
+set stl=%<%f\                     " Filename
+set stl+=%w%h%m%r                 " Options
+set stl+=\ [%{&ff}/%Y]            " Filetype
+set stl+=\ [%{getcwd()}]          " Current dir
+set stl+=%=%-14.(%l,%c%V%)\ %p%%  " Right aligned file nav info
+set sb
+set spr
+set hi=1024
+set ru
+set nu
+
+set sm
+set hls
+set is
+set bs=2
+set wrap
+set tw=80
+set ts=4
+set sw=4
+set et
+set sr
+
+set ai
+set cin
+set cino=:0,l1,g0,(0,W4
+set si
+set tm=400
+
+set t_Co=256
+" set t_AB=[48;5;%dm
+" set t_AF=[38;5;%dm
+" set t_ZH=[3m
+" set t_ZR=[23m
+
+if has("termguicolors")
+    set t_8f=[38;2;%lu;%lu;%lum
+    set t_8b=[48;2;%lu;%lu;%lum
+    set tgc
+endif
+
+if has("gui_running")
+    highlight CursorLine gui=NONE guibg=#115544
+else
+    highlight CursorLine cterm=underline
+endif
+set cul
+
+" screen
+" if &term =~ "screen" || exists("$TERMCAP")
+"    set t_ts=k
+"    set t_fs=\
+" endif
+set titlestring=%t\ -\ %{v:progname}
+set titleold=""
+set title
+
+syntax on
+filetype plugin indent on
+
+runtime bundle/vim-pathogen/autoload/pathogen.vim
+
+if $IS_LOGIN == "yes"
+    let g:pathogen_disabled = ["vim-airline"]
+endif
+execute pathogen#infect()
+" execute pathogen#helptags()
+
+" taglist
+let Tlist_Exit_OnlyWindow = 1
+let Tlist_Show_One_File = 1
+let Tlist_Use_Right_Window = 1
+if has("gui_win32")
+    let Tlist_Ctags_Cmd = 'c:\windows\system32\ctags.exe'
+endif
+
+" delimitMate
+let delimitMate_expand_cr = 1
+"let delimitMate_expand_space = 1
+
+" tagbar
+if has("gui_win32")
+    let g:tagbar_ctags_bin = 'c:\windows\system32\ctags.exe'
+endif
+
+" turn off session autoload & autosave
+let g:session_autoload = 'no'
+let g:session_autosave = 'no'
+
+" SuperTab true <TAB>
+let g:SuperTabMappingTabLiteral = '<c-v>'
+
+" UltiSnips
+let g:UltiSnipsSnippetDirectories=["ulti_snippets"]
+
+" Airline
+let g:airline_powerline_fonts = 1
+
+" gruvbox
+let g:gruvbox_italic=1
+
+if has("gui_running")
+    colorscheme neon
+    if has("gui_win32")
+        set gfn=Consolas:h11:cANSI
+    else
+        set gfn=Inconsolata\ 11
+    endif
+else
+    colorscheme gruvbox
+endif
+
+" function! DeleteTrailingSpace()
+"    exe "normal mQ"
+"    %s/\s\+$//ge
+"    exe "normal `Q"
+" endfunction
+" nmap dts :call DeleteTrailingSpace()<CR>
+
+" fold
+function Fold_Toggle()
+    if exists("b:fold_toggle")
+        if b:fold_toggle == 1
+            exe "normal" "zR"
+            set foldmethod=manual
+            let b:fold_toggle = 0
+        else
+            set foldmethod=syntax
+            exe "normal" "zM"
+            let b:fold_toggle = 1
+        endif
+    else
+        if &foldmethod != "syntax"
+            set foldmethod=syntax
+            exe "normal" "zM"
+            let b:fold_toggle = 1
+        else
+            exe "normal" "zR"
+            set foldmethod=manual
+            let b:fold_toggle = 0
+        endif
+    endif
+endfunction
+nmap <silent> <Leader>ft :call Fold_Toggle()<CR>
+
+function Search_Keyword(mode)
+    let l:fname = expand('%')
+    let l:word = expand('<cword>')
+    if a:mode == 'w'
+        let l:word = "'\\<".l:word."\\>'"
+    endif
+    if l:fname =~ '.*\.\(c\|cc\|cpp\|cxx\|h\|hh\|hpp\|hxx\)'
+        exe '!key_c' l:word
+    elseif l:fname =~ '.*\.java'
+        exe '!key_java' l:word
+    elseif l:fname =~ '\(.*\.mk\)\|Makefile\|makefile'
+        exe '!key_mk' l:word
+    elseif l:fname =~ '.*\.py'
+        exe '!key_py' l:word
+    endif
+endfunction
+
+function Get_KeyScript()
+    let l:fname = expand('%')
+    if l:fname =~ '.*\.\(c\|cc\|cpp\|cxx\|h\|hh\|hpp\|hxx\)'
+        return 'key_c'
+    elseif l:fname =~ '.*\.java'
+        return 'key_java'
+    elseif l:fname =~ '\(.*\.mk\)\|Makefile\|makefile'
+        return 'key_mk'
+    elseif l:fname =~ '.*\.py'
+        return 'key_py'
+    endif
+    return 'none'
+endfunction
+"nmap <silent> <C-K> :call Search_Keyword('s')<CR>
+" nmap <silent> <C-K> :set efm=%f:%l:%m<CR>:cgetexpr system(Get_KeyScript() . ' ' . expand('<cword>'))<CR>:copen<CR>
+"nmap <silent> <C-K>w :call Search_Keyword('w')<CR>
+nmap <silent> <C-K>     :Ack! '<cword>' '.'<CR>
+nmap <silent> <C-K>c    :Ack! --cc '<cword>' '.'<CR>
+" nmap <silent> <C-K> :set efm=%f:%l:%c:%m,%f:%l:%m<CR>:cgetexpr system('ack-grep -s -H --nopager --nocolor --nogroup --column '.expand('<cword>').' .')<CR>:copen<CR>
+
+" cscope
+nmap <C-\>s :cs find s <C-R>=expand("<cword>")<CR><CR>
+nmap <C-\>g :cs find g <C-R>=expand("<cword>")<CR><CR>
+nmap <C-\>d :cs find d <C-R>=expand("<cword>")<CR><CR>
+nmap <C-\>c :cs find c <C-R>=expand("<cword>")<CR><CR>
+nmap <C-\>t :cs find t <C-R>=expand("<cword>")<CR><CR>
+nmap <C-\>e :cs find e <C-R>=expand("<cword>")<CR><CR>
+nmap <C-\>f :cs find f <C-R>=expand("<cfile>")<CR><CR>
+nmap <C-\>i :cs find i ^<C-R>=expand("<cfile>")<CR>$<CR>
+

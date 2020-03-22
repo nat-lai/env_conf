@@ -1,0 +1,30 @@
+vbell off
+
+defc1 on
+
+#term screen-256color
+term xterm
+termcapinfo xterm 'Co#256:AB=\E[48;5;%dm:AF=\E[38;5;%dm'
+
+attrcolor b ".I"
+attrcolor i "+b"
+
+defbce on
+
+startup_message off
+
+autodetach on
+
+#hardstatus alwayslastline "%{=b}%{bw} %{ck} %-Lw%{gw}%n %t%? (%u) %: 1u %? %{-}%+Lw %{bw}"
+#hardstatus alwayslastline "%{wk}%-w%{Gk}[%n %t %h]%{wk}%+w%=%{Ck}%D %M"
+#hardstatus alwayslastline "%{=ud}%{wb}%-w%{=b}%{kg}[%n %t]%{-}%+w"
+hardstatus alwayslastline "%{=b}%{+ gk}%-w%{+ dY} [%n %t] %{-}%+w %=%{dG} %D %M,%d (%0c)"
+
+#hardstatus alwayslastline
+#hardstatus string "%{.bW}%-w%{.rW}%n %t%{-}%+w %=%{..G} %H %{..Y} %d/%m %C%a "
+#caption always "%3n %t%? @%u%?%? [%h]%?"
+
+shelltitle "$ |bash"
+
+screen 1
+screen 0
